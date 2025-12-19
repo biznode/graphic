@@ -7,5 +7,7 @@ linter:
     hash_and_equals: false
 
 analyzer:
+  errors:
+    sort_child_properties_last: ignore
   exclude:
     - "devdoc/**"

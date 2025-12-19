@@ -229,14 +229,14 @@ class ChartState<D> extends State<Chart<D>> with TickerProviderStateMixin {
       //Dispose of old view, when the widget rebuilds
       view?.dispose();
       view = null;
-    } else if (widget.changeData == true ||
-        (widget.changeData == null && widget.data != oldWidget.data)) {
+    } else if (widget.changeData == true || (widget.changeData == null && widget.data != oldWidget.data)) {
       view!.changeData(widget.data);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final gestures = widget.selections?.values.expand((s) => {...?s.on, ...?s.clear}).toSet() ?? {};
     return CustomSingleChildLayout(
       delegate: _ChartLayoutDelegate<D>(this),
       child: MouseRegion(
@@ -249,477 +249,561 @@ class ChartState<D> extends State<Chart<D>> with TickerProviderStateMixin {
                 painter: _ChartPainter<D>(this),
               ),
             ),
-            onDoubleTap: () {
-              view!.gesture(Gesture(
-                GestureType.doubleTap,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onDoubleTapCancel: () {
-              view!.gesture(Gesture(
-                GestureType.doubleTapCancel,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onDoubleTapDown: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.doubleTapDown,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onForcePressEnd: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.forcePressEnd,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onForcePressPeak: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.forcePressPeak,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onForcePressStart: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.forcePressStart,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onForcePressUpdate: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.forcePressUpdate,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onLongPress: () {
-              view!.gesture(Gesture(
-                GestureType.longPress,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onLongPressCancel: () {
-              view!.gesture(Gesture(
-                GestureType.longPressCancel,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onLongPressDown: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.longPressDown,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onLongPressEnd: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              gestureLocalMoveStart = null;
-              view!.gesture(Gesture(
-                GestureType.longPressEnd,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-              ));
-            },
-            onLongPressMoveUpdate: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.longPressMoveUpdate,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-              ));
-            },
-            onLongPressStart: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              gestureLocalMoveStart = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.longPressStart,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onLongPressUp: () {
-              view!.gesture(Gesture(
-                GestureType.longPressUp,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onScaleEnd: (detail) {
-              view!.gesture(Gesture(
-                GestureType.scaleEnd,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-              ));
-              gestureLocalMoveStart = null;
-              gestureScaleDetail = null;
-            },
-            onScaleStart: (detail) {
-              gestureLocalPosition = detail.localFocalPoint;
-              gestureLocalMoveStart = detail.localFocalPoint;
-              // Mock a ScaleUpdateDetails so that the first scale update will have
-              // a preScaleDetail.
-              gestureScaleDetail = ScaleUpdateDetails(
-                focalPoint: detail.focalPoint,
-                localFocalPoint: detail.localFocalPoint,
-                pointerCount: detail.pointerCount,
-              );
-              view!.gesture(Gesture(
-                GestureType.scaleStart,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onScaleUpdate: (detail) {
-              gestureLocalPosition = detail.localFocalPoint;
-              view!.gesture(Gesture(
-                GestureType.scaleUpdate,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-                preScaleDetail: gestureScaleDetail,
-              ));
-              gestureScaleDetail = detail;
-            },
-            onSecondaryLongPress: () {
-              view!.gesture(Gesture(
-                GestureType.secondaryLongPress,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryLongPressCancel: () {
-              view!.gesture(Gesture(
-                GestureType.secondaryLongPressCancel,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryLongPressDown: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.secondaryLongPressDown,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryLongPressEnd: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              gestureLocalMoveStart = null;
-              view!.gesture(Gesture(
-                GestureType.secondaryLongPressEnd,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-              ));
-            },
-            onSecondaryLongPressMoveUpdate: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.secondaryLongPressMoveUpdate,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-              ));
-            },
-            onSecondaryLongPressStart: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              gestureLocalMoveStart = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.secondaryLongPressStart,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryLongPressUp: () {
-              view!.gesture(Gesture(
-                GestureType.secondaryLongPressUp,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryTap: () {
-              view!.gesture(Gesture(
-                GestureType.secondaryTap,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryTapCancel: () {
-              view!.gesture(Gesture(
-                GestureType.secondaryTapCancel,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryTapDown: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.secondaryTapDown,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onSecondaryTapUp: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.secondaryTapUp,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onTap: () {
-              view!.gesture(Gesture(
-                GestureType.tap,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onTapCancel: () {
-              view!.gesture(Gesture(
-                GestureType.tapCancel,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onTapDown: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.tapDown,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onTapUp: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.tapUp,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryLongPress: () {
-              view!.gesture(Gesture(
-                GestureType.tertiaryLongPress,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryLongPressCancel: () {
-              view!.gesture(Gesture(
-                GestureType.tertiaryLongPressCancel,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryLongPressDown: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.tertiaryLongPressDown,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryLongPressEnd: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              gestureLocalMoveStart = null;
-              view!.gesture(Gesture(
-                GestureType.tertiaryLongPressEnd,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-              ));
-            },
-            onTertiaryLongPressMoveUpdate: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.tertiaryLongPressMoveUpdate,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-                localMoveStart: gestureLocalMoveStart,
-              ));
-            },
-            onTertiaryLongPressStart: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              gestureLocalMoveStart = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.tertiaryLongPressStart,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryLongPressUp: () {
-              view!.gesture(Gesture(
-                GestureType.tertiaryLongPressUp,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryTapCancel: () {
-              view!.gesture(Gesture(
-                GestureType.tertiaryTapCancel,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                null,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryTapDown: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.tertiaryTapDown,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
-            onTertiaryTapUp: (detail) {
-              gestureLocalPosition = detail.localPosition;
-              view!.gesture(Gesture(
-                GestureType.tertiaryTapUp,
-                gestureKind,
-                gestureLocalPosition,
-                size,
-                detail,
-                chartKey: widget.key,
-              ));
-            },
+            onDoubleTap: gestures.contains(GestureType.doubleTap)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.doubleTap,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onDoubleTapCancel: gestures.contains(GestureType.doubleTapCancel)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.doubleTapCancel,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onDoubleTapDown: gestures.contains(GestureType.doubleTapDown)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.doubleTapDown,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onForcePressEnd: gestures.contains(GestureType.forcePressEnd)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.forcePressEnd,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onForcePressPeak: gestures.contains(GestureType.forcePressPeak)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.forcePressPeak,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onForcePressStart: gestures.contains(GestureType.forcePressStart)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.forcePressStart,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onForcePressUpdate: gestures.contains(GestureType.forcePressUpdate)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.forcePressUpdate,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onLongPress: gestures.contains(GestureType.longPress)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.longPress,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onLongPressCancel: gestures.contains(GestureType.longPressCancel)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.longPressCancel,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onLongPressDown: gestures.contains(GestureType.longPressDown)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.longPressDown,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onLongPressEnd: gestures.contains(GestureType.longPressEnd)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    gestureLocalMoveStart = null;
+                    view!.gesture(Gesture(
+                      GestureType.longPressEnd,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                    ));
+                  }
+                : null,
+            onLongPressMoveUpdate: gestures.contains(GestureType.longPressMoveUpdate)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.longPressMoveUpdate,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                    ));
+                  }
+                : null,
+            onLongPressStart: gestures.contains(GestureType.longPressStart)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    gestureLocalMoveStart = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.longPressStart,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onLongPressUp: gestures.contains(GestureType.longPressUp)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.longPressUp,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onScaleEnd: gestures.contains(GestureType.scaleEnd)
+                ? (detail) {
+                    view!.gesture(Gesture(
+                      GestureType.scaleEnd,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                    ));
+                    gestureLocalMoveStart = null;
+                    gestureScaleDetail = null;
+                  }
+                : null,
+            onScaleStart: gestures.contains(GestureType.scaleStart)
+                ? (detail) {
+                    gestureLocalPosition = detail.localFocalPoint;
+                    gestureLocalMoveStart = detail.localFocalPoint;
+                    // Mock a ScaleUpdateDetails so that the first scale update will have
+                    // a preScaleDetail.
+                    gestureScaleDetail = ScaleUpdateDetails(
+                      focalPoint: detail.focalPoint,
+                      localFocalPoint: detail.localFocalPoint,
+                      pointerCount: detail.pointerCount,
+                    );
+                    view!.gesture(Gesture(
+                      GestureType.scaleStart,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onScaleUpdate: gestures.contains(GestureType.scaleUpdate)
+                ? (detail) {
+                    gestureLocalPosition = detail.localFocalPoint;
+                    view!.gesture(Gesture(
+                      GestureType.scaleUpdate,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                      preScaleDetail: gestureScaleDetail,
+                    ));
+                    gestureScaleDetail = detail;
+                  }
+                : null,
+            onSecondaryLongPress: gestures.contains(GestureType.secondaryLongPress)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.secondaryLongPress,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryLongPressCancel: gestures.contains(GestureType.secondaryLongPressCancel)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.secondaryLongPressCancel,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryLongPressDown: gestures.contains(GestureType.secondaryLongPressDown)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.secondaryLongPressDown,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryLongPressEnd: gestures.contains(GestureType.secondaryLongPressEnd)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    gestureLocalMoveStart = null;
+                    view!.gesture(Gesture(
+                      GestureType.secondaryLongPressEnd,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                    ));
+                  }
+                : null,
+            onSecondaryLongPressMoveUpdate: gestures.contains(GestureType.secondaryLongPressMoveUpdate)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.secondaryLongPressMoveUpdate,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                    ));
+                  }
+                : null,
+            onSecondaryLongPressStart: gestures.contains(GestureType.secondaryLongPressStart)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    gestureLocalMoveStart = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.secondaryLongPressStart,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryLongPressUp: gestures.contains(GestureType.secondaryLongPressUp)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.secondaryLongPressUp,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryTap: gestures.contains(GestureType.secondaryTap)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.secondaryTap,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryTapCancel: gestures.contains(GestureType.secondaryTapCancel)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.secondaryTapCancel,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryTapDown: gestures.contains(GestureType.secondaryTapDown)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.secondaryTapDown,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onSecondaryTapUp: gestures.contains(GestureType.secondaryTapUp)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.secondaryTapUp,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTap: gestures.contains(GestureType.tap)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.tap,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTapCancel: gestures.contains(GestureType.tapCancel)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.tapCancel,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTapDown: gestures.contains(GestureType.tapDown)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.tapDown,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTapUp: gestures.contains(GestureType.tapUp)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.tapUp,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryLongPress: gestures.contains(GestureType.tertiaryLongPress)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryLongPress,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryLongPressCancel: gestures.contains(GestureType.tertiaryLongPressCancel)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryLongPressCancel,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryLongPressDown: gestures.contains(GestureType.tertiaryLongPressDown)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryLongPressDown,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryLongPressEnd: gestures.contains(GestureType.tertiaryLongPressEnd)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    gestureLocalMoveStart = null;
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryLongPressEnd,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                    ));
+                  }
+                : null,
+            onTertiaryLongPressMoveUpdate: gestures.contains(GestureType.tertiaryLongPressMoveUpdate)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryLongPressMoveUpdate,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                      localMoveStart: gestureLocalMoveStart,
+                    ));
+                  }
+                : null,
+            onTertiaryLongPressStart: gestures.contains(GestureType.tertiaryLongPressStart)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    gestureLocalMoveStart = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryLongPressStart,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryLongPressUp: gestures.contains(GestureType.tertiaryLongPressUp)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryLongPressUp,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryTapCancel: gestures.contains(GestureType.tertiaryTapCancel)
+                ? () {
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryTapCancel,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      null,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryTapDown: gestures.contains(GestureType.tertiaryTapDown)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryTapDown,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
+            onTertiaryTapUp: gestures.contains(GestureType.tertiaryTapUp)
+                ? (detail) {
+                    gestureLocalPosition = detail.localPosition;
+                    view!.gesture(Gesture(
+                      GestureType.tertiaryTapUp,
+                      gestureKind,
+                      gestureLocalPosition,
+                      size,
+                      detail,
+                      chartKey: widget.key,
+                    ));
+                  }
+                : null,
           ),
           onPointerHover: (event) {
             gestureKind = event.kind;
@@ -832,6 +916,5 @@ class _ChartPainter<D> extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) =>
-      this != oldDelegate;
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => this != oldDelegate;
 }
